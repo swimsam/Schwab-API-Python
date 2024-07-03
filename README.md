@@ -1,51 +1,52 @@
-# Schwab-API-Python 
-This is an unofficial python program to access the Schwab api.    
-You will need a Schwab developer account [here](https://beta-developer.schwab.com/).        
-Join the [Discord group](https://discord.gg/m7SSjr9rs9)
+# Schwab-API-Python
+![PyPI - Version](https://img.shields.io/pypi/v/schwabdev) ![Discord](https://img.shields.io/discord/1076596998150561873?logo=discord) ![PyPI - Downloads](https://img.shields.io/pypi/dm/schwabdev) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?business=8VDFKHMBFSC2Q&no_recurring=0&currency_code=USD) ![YouTube Video Views](https://img.shields.io/youtube/views/kHbom0KIJwc?style=flat&logo=youtube)  
+This is an unofficial python program to access the Schwab api.  
+[Discord](https://discord.gg/m7SSjr9rs9), [PyPI](https://pypi.org/project/schwabdev/), [Youtube](https://youtube.com/playlist?list=PLs4JLWxBQIxpbvCj__DjAc0RRTlBz-TR8), [Github](https://github.com/tylerebowers/Schwab-API-Python).
 
+## Installation 
+`pip install schwabdev requests websockets`  
+*You may need to use `pip3` instead of `pip`*
 
 ## Quick setup
-1. Create a new Schwab individual developer app with callback url "https://127.0.0.1" (case sensitive) and wait until the status is "Ready for use", note that "Approved - Pending" will not work.
-2. Enable TOS (Thinkorswim) for your Schwab account, it is needed for orders and other api calls.
-3. Python version 3.11 or higher is required.     
-4. `pip3 install requests websockets python-dotenv tk`
-5. Paste keys in the `.env` file specifically appKey and appSecret.
-6. Start by running the main.py file.
+1. Setup your Schwab developer account [here](https://beta-developer.schwab.com/).
+   - Create a new Schwab individual developer app with callback url "https://127.0.0.1" (case sensitive) 
+   - Wait until the status is "Ready for use", note that "Approved - Pending" will not work.
+   - Enable TOS (Thinkorswim) for your Schwab account, it is needed for orders and other api calls.
+2. Install packages
+   - Install schwabdev and requirements `pip install schwabdev requests websockets`
+   - *You may need to use `pip3` instead of `pip`*
+3. Examples on how to use the client are in `examples/api_demo.py` | `examples/stream_demo.py` (add your keys in the .env file)  
+   - The first time you run you will have to sign in to your Schwab account using the generated link in the terminal. After signing in, agree to the terms, and select account(s). Then you will have to copy the link in the address bar and paste it into the terminal. 
+   - Questions? - join the [Discord group](https://discord.gg/m7SSjr9rs9).  
+```py
+import schwabdev #import the package
+
+client = schwabdev.Client('Your app key', 'Your app secret')  #create a client
+
+client.update_tokens_auto() #start the auto access token updater
+
+print(client.account_linked().json()) #make api calls
+```
 
 ## What can this program do?
- - Authenticate and access the api (`api.initialize()`)
- - Functions for all api functions (examples in `main.py`)
- - Auto "access token" updates (`api.updateTokensAutomatic()`)
- - Stream real-time data (`stream.startManual()`)
- - Automatically start/stop stream (`stream.startAutomatic()`)
+ - Authenticate and access the api 
+ - Functions for all api functions (examples in `examples/api_demo.py`)
+ - Auto "access token" updates (`client.update_tokens_auto()`)
+ - Stream real-time data with customizable response handler (examples in `examples/stream_demo.py`)
  ### TBD 
  - Automatic refresh token updates. (Waiting for Schwab implementation)
- - Customizable stream response handler. (Waiting for Schwab implementation)
 
+## Notes
 
-## Usage and Design
-This python client makes working with the TD/Schwab api easier.    
-The idea is to make an easy to understand, organized, and highly-automatic interface for the api.   
-Below is a light documentation on how it works, python is pseudocode-esk so if you are confused just read the code and follow the functions. 
-
-### Organization
-
-The root of the wrapper:
- - `main.py` where the main program is run from, contains examples for you to get started with.
- - `.env` contains the app key and app secret, these need to be filled in.
- - `tokens.json` contains api tokens as well as dates for when they expire.
-
-The modules folder contains code for main operations:     
+The schwabdev folder contains code for main operations:     
  - `api.py` contains functions relating to api calls, requests, and automatic token checker threads.
  - `stream.py` contains functions for streaming data from websockets.
- - `terminal.py` contains a program for making additional terminal windows and printing to the terminal with color.
+ - `color_print.py` contains functions to print to the terminal with color.
 
-<!---
-### Initialization
-main.py initializes below main() in `if __name__ == '__main__':` each call is described below:
- 1. `api.initialize()` # This calls a function that checks if the access or refresh token need to be re-authenticated. It also adds the tokens and expire times to variables in `universe.py`
- 2. `main()` # This is where you put your code to be run.
--->
+## Youtube Tutorials
+1. [Authentication and Requests](https://www.youtube.com/watch?v=kHbom0KIJwc&ab_channel=TylerBowers) *Github code has significantly changed since this video*
+2. [Streaming Real-time Data](https://www.youtube.com/watch?v=t7F2dUecgWc&list=PLs4JLWxBQIxpbvCj__DjAc0RRTlBz-TR8&index=2&ab_channel=TylerBowers)
+
 ## License (MIT)
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
