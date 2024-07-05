@@ -7,6 +7,33 @@ from . import color_print
 from .stream import Stream
 from datetime import datetime
 
+import asyncio
+from playwright.async_api import async_playwright
+
+async def capture_oauth_redirect_url(auth_url, redirect_uri):
+    async with async_playwright() as p:
+        # Launch a browser
+        browser = await p.firefox.launch(headless=False)  # Set headless=True if you don't need a UI
+        context = await browser.new_context()
+
+        # Open a new page
+        page = await context.new_page()
+
+        # Navigate to the authorization URL
+        await page.goto(auth_url)
+
+        # Define a function to check if the current URL matches the redirect URI
+        def check_redirect_url():
+            current_url = page.url
+            return current_url.startswith(redirect_uri)
+
+        # Continuously check the URL until it matches the redirect URI or a timeout occurs
+        while not check_redirect_url():
+            await asyncio.sleep(1)  # Adjust the sleep interval as needed
+
+        # Close the browser
+        await browser.close()
+        return page.url
 
 class Client:
 
@@ -146,11 +173,9 @@ class Client:
         # get authorization code (requires user to authorize)
         color_print.user("Please authorize this program to access your schwab account.")
         auth_url = f'https://api.schwabapi.com/v1/oauth/authorize?client_id={self._app_key}&redirect_uri={self._callback_url}'
-        color_print.user(f"Click to authenticate: {auth_url}")
-        color_print.user("Opening browser...")
-        webbrowser.open(auth_url)
-        response_url = color_print.user_input(
-            "After authorizing, wait for it to load (<1min) and paste the WHOLE url here: ")
+        # Run the async function
+        response_url = asyncio.run(capture_oauth_redirect_url(auth_url, self._callback_url))
+
         code = f"{response_url[response_url.index('code=') + 5:response_url.index('%40')]}@"  # session = responseURL[responseURL.index("session=")+8:]
         # get new access and refresh tokens
         response = self._post_oauth_token('authorization_code', code)
